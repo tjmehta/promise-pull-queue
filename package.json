@@ -1,7 +1,7 @@
 {
-  "name": "node-module-template",
+  "name": "deferred-queue",
   "version": "1.0.0",
-  "description": "Description",
+  "description": "A promise queue class for handling push and pull based async tasks",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tjmehta/node-module-template.git"
+    "url": "git+https://github.com/tjmehta/deferred-queue.git"
   },
   "keywords": [],
   "author": "Tejesh Mehta",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tjmehta/node-module-template/issues"
+    "url": "https://github.com/tjmehta/deferred-queue/issues"
   },
-  "homepage": "https://github.com/tjmehta/node-module-template#readme",
+  "homepage": "https://github.com/tjmehta/deferred-queue#readme",
   "devDependencies": {
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-typescript": "^7.10.1",
