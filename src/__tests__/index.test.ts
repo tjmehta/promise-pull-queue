@@ -1,9 +1,9 @@
-import DeferredQueue from '../index'
+import PullQueue from '../index'
 import createDeferred from 'p-defer'
 
-describe('DeferredQueue', () => {
+describe('PullQueue', () => {
   it('should queue pushed values', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     queue.pushValue(10)
     queue.pushValue(20)
     queue.pushValue(30)
@@ -16,7 +16,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from pushed values later', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     setTimeout(() => {
       queue.pushValue(10)
       queue.pushValue(20)
@@ -31,7 +31,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should queue pushed errors', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     queue.pushError(new Error('1'))
     queue.pushError(new Error('2'))
     queue.pushError(new Error('3'))
@@ -44,7 +44,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from pushed errors later', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     setTimeout(() => {
       queue.pushError(new Error('1'))
       queue.pushError(new Error('2'))
@@ -59,7 +59,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from pushed resolved promises', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     queue.push(Promise.resolve(10))
     queue.push(Promise.resolve(20))
     queue.push(Promise.resolve(30))
@@ -72,7 +72,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from resolved promises pushed later', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     setTimeout(() => {
       queue.push(Promise.resolve(10))
       queue.push(Promise.resolve(20))
@@ -87,7 +87,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from pushed rejected promises', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     queue.push(Promise.reject(new Error('1'))).catch(() => {})
     queue.push(Promise.reject(new Error('2')))
     queue.push(Promise.reject(new Error('3')))
@@ -100,7 +100,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from rejected promises pushed later', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     setTimeout(() => {
       queue.push(Promise.reject(new Error('1')))
       queue.push(Promise.reject(new Error('2')))
@@ -115,7 +115,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from pushed promises that resolve later', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     const d1 = createDeferred()
     queue.push(d1.promise)
     const d2 = createDeferred()
@@ -136,7 +136,7 @@ describe('DeferredQueue', () => {
   })
 
   it('should pull values in order from pushed promises that reject later', async () => {
-    const queue = new DeferredQueue()
+    const queue = new PullQueue()
     const d1 = createDeferred()
     queue.push(d1.promise)
     const d2 = createDeferred()

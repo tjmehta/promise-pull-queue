@@ -1,7 +1,7 @@
 {
-  "name": "deferred-queue",
+  "name": "promise-pull-queue",
   "version": "1.0.0",
-  "description": "A promise queue class for handling push and pull based async tasks",
+  "description": "A promise queue class for handling pull based async tasks",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tjmehta/deferred-queue.git"
+    "url": "git+https://github.com/tjmehta/promise-pull-queue.git"
   },
   "keywords": [
     "promise",
@@ -26,9 +26,9 @@
   "author": "Tejesh Mehta",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tjmehta/deferred-queue/issues"
+    "url": "https://github.com/tjmehta/promise-pull-queue/issues"
   },
-  "homepage": "https://github.com/tjmehta/deferred-queue#readme",
+  "homepage": "https://github.com/tjmehta/promise-pull-queue#readme",
   "devDependencies": {
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-typescript": "^7.10.1",
