@@ -13,7 +13,16 @@
     "type": "git",
     "url": "git+https://github.com/tjmehta/deferred-queue.git"
   },
-  "keywords": [],
+  "keywords": [
+    "promise",
+    "queue",
+    "defer",
+    "deferred",
+    "pull",
+    "push",
+    "pop",
+    "async"
+  ],
   "author": "Tejesh Mehta",
   "license": "MIT",
   "bugs": {
