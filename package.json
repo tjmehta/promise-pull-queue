@@ -13,8 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/tjmehta/node-module-template.git"
   },
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "Tejesh Mehta",
   "license": "MIT",
   "bugs": {
@@ -30,5 +29,10 @@
     "jest": "^26.0.1",
     "prettier": "^2.0.5",
     "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "p-defer": "^3.0.0",
+    "p-lazy": "^3.0.0",
+    "time-oset": "^1.0.1"
   }
 }
