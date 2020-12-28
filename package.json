@@ -42,7 +42,7 @@
   "dependencies": {
     "p-defer": "^3.0.0",
     "p-lazy": "^3.0.0",
-    "race-abort": "^1.0.1",
+    "race-abort": "^1.0.2",
     "time-oset": "^1.0.1"
   }
 }
