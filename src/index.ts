@@ -1,54 +1,113 @@
 import createDeferred, { DeferredPromise } from 'p-defer'
+import raceAbort, { AbortError } from 'race-abort'
 
 import PLazy from 'p-lazy'
 import TimeOrderedSet from 'time-oset'
 
+export { AbortError } from 'race-abort'
+
+type Task<T> = (signal: AbortSignal) => Promise<T>
+type PullQueueItem<T> = {
+  deferred: DeferredPromise<T>
+  signal: AbortSignal
+}
+
 export default class DeferredQueue<T> {
-  private pushSet = new TimeOrderedSet<Promise<T>>()
-  private pullSet = new TimeOrderedSet<DeferredPromise<T>>()
+  private pushQueue = new TimeOrderedSet<Task<T>>()
+  private pullQueue = new TimeOrderedSet<PullQueueItem<T>>()
+
+  get pushQueueSize() {
+    return this.pushQueue.size
+  }
+
+  get pullQueueSize() {
+    return this.pullQueue.size
+  }
 
   pushValue = (val: T) => {
-    this.push(
+    return this.pushPromise(
       new PLazy<T>((resolve) => resolve(val)),
     )
   }
   pushError = (err: any) => {
-    this.push(
+    return this.pushPromise(
       new PLazy<T>((resolve, reject) => reject(err)),
     )
   }
-  push = (promise: Promise<T>) => {
-    // prevent unhandled rejections if promise revolves early
-    promise.catch(() => {})
-
-    if (this.pullSet.size) {
+  pushPromise = (promise: Promise<T>) => {
+    return this.push((signal) => raceAbort(signal, promise))
+  }
+  push = (task: Task<T>) => {
+    let item
+    if (this.pullQueue.size) {
       // queue has deferreds waiting for results, resolve the earliest
-      const deferred = this.pullSet.shift() as DeferredPromise<T>
-      promise.then(
-        (val) => deferred.resolve(val),
-        (err) => deferred.reject(err),
-      )
+      do {
+        item = this.pullQueue.shift()
+      } while (item?.signal.aborted)
+    }
+    if (item) {
+      const { deferred, signal } = item
+      raceAbort(signal, task).then(deferred.resolve, deferred.reject)
 
       return deferred.promise
     } else {
       // queue does not have any deferreds waiting for results
-      // create a promised to to be pulled later
-      promise.catch(() => {})
-      this.pushSet.push(promise)
+      // push the async task to be pulled later
+      const deferred = createDeferred<T>()
+      this.pushQueue.push((signal) => {
+        return raceAbort(signal, task).then(
+          (val) => {
+            deferred.resolve(val)
+            return Promise.resolve(val)
+          },
+          (err) => {
+            deferred.reject(err)
+            return Promise.reject(err)
+          },
+        )
+      })
+      // prevent unhandled exceptions incase this promise is not handled
+      deferred.promise.catch(() => {})
 
-      return promise
+      return deferred.promise
     }
   }
-  pull = (): Promise<T> => {
-    if (this.pushSet.size) {
+  pull = (signal?: AbortSignal): Promise<T> => {
+    const _signal = signal ?? new AbortController().signal
+    if (this.pushQueue.size) {
       // queue has results, pull earliest
-      return this.pushSet.shift() as Promise<T>
+      const task = this.pushQueue.shift() as Task<T>
+      return raceAbort(_signal, task)
     }
 
     // queue does not have any results,
     // create a deferred to wait for the next result
     const deferred = createDeferred<T>()
-    this.pullSet.push(deferred)
+    const pullItem = {
+      deferred,
+      signal: _signal,
+    }
+    const handleAbort = () => pullItem.deferred.reject(new AbortError())
+    const cleanup = () => {
+      pullItem.signal.removeEventListener('abort', handleAbort)
+      this.pullQueue.delete(pullItem)
+    }
+    pullItem.signal.addEventListener('abort', handleAbort)
+    const resolve = deferred.resolve.bind(deferred)
+    const reject = deferred.reject.bind(deferred)
+    pullItem.deferred.resolve = (val) => {
+      cleanup()
+      return resolve(val)
+    }
+    pullItem.deferred.reject = (err) => {
+      cleanup()
+      return reject(err)
+    }
+    if (pullItem.signal.aborted) {
+      handleAbort()
+    } else {
+      this.pullQueue.push(pullItem)
+    }
 
     return deferred.promise
   }

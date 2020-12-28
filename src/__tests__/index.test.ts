@@ -60,9 +60,9 @@ describe('PullQueue', () => {
 
   it('should pull values in order from pushed resolved promises', async () => {
     const queue = new PullQueue()
-    queue.push(Promise.resolve(10))
-    queue.push(Promise.resolve(20))
-    queue.push(Promise.resolve(30))
+    queue.pushPromise(Promise.resolve(10))
+    queue.pushPromise(Promise.resolve(20))
+    queue.pushPromise(Promise.resolve(30))
 
     await Promise.all([
       expect(queue.pull()).resolves.toMatchInlineSnapshot(`10`),
@@ -74,9 +74,9 @@ describe('PullQueue', () => {
   it('should pull values in order from resolved promises pushed later', async () => {
     const queue = new PullQueue()
     setTimeout(() => {
-      queue.push(Promise.resolve(10))
-      queue.push(Promise.resolve(20))
-      queue.push(Promise.resolve(30))
+      queue.pushPromise(Promise.resolve(10))
+      queue.pushPromise(Promise.resolve(20))
+      queue.pushPromise(Promise.resolve(30))
     }, 10)
 
     await Promise.all([
@@ -86,11 +86,34 @@ describe('PullQueue', () => {
     ])
   })
 
+  it('should pull values in order from resolved promises pushed later, and cancel some', async () => {
+    const queue = new PullQueue()
+    setTimeout(() => {
+      queue.pushPromise(Promise.resolve(10))
+      queue.pushPromise(Promise.resolve(20))
+      queue.pushPromise(Promise.resolve(30))
+    }, 10)
+
+    const controller = new AbortController()
+    controller.abort()
+    await Promise.all([
+      expect(queue.pull(controller.signal)).rejects.toMatchInlineSnapshot(
+        `[AbortError: aborted]`,
+      ),
+      expect(queue.pull(controller.signal)).rejects.toMatchInlineSnapshot(
+        `[AbortError: aborted]`,
+      ),
+      expect(queue.pull()).resolves.toMatchInlineSnapshot(`10`),
+      expect(queue.pull()).resolves.toMatchInlineSnapshot(`20`),
+      expect(queue.pull()).resolves.toMatchInlineSnapshot(`30`),
+    ])
+  })
+
   it('should pull values in order from pushed rejected promises', async () => {
     const queue = new PullQueue()
-    queue.push(Promise.reject(new Error('1'))).catch(() => {})
-    queue.push(Promise.reject(new Error('2')))
-    queue.push(Promise.reject(new Error('3')))
+    queue.pushPromise(Promise.reject(new Error('1'))).catch(() => {})
+    queue.pushPromise(Promise.reject(new Error('2')))
+    queue.pushPromise(Promise.reject(new Error('3')))
 
     await Promise.all([
       expect(queue.pull()).rejects.toMatchInlineSnapshot(`[Error: 1]`),
@@ -102,9 +125,9 @@ describe('PullQueue', () => {
   it('should pull values in order from rejected promises pushed later', async () => {
     const queue = new PullQueue()
     setTimeout(() => {
-      queue.push(Promise.reject(new Error('1')))
-      queue.push(Promise.reject(new Error('2')))
-      queue.push(Promise.reject(new Error('3')))
+      queue.pushPromise(Promise.reject(new Error('1')))
+      queue.pushPromise(Promise.reject(new Error('2')))
+      queue.pushPromise(Promise.reject(new Error('3')))
     }, 10)
 
     await Promise.all([
@@ -117,11 +140,11 @@ describe('PullQueue', () => {
   it('should pull values in order from pushed promises that resolve later', async () => {
     const queue = new PullQueue()
     const d1 = createDeferred()
-    queue.push(d1.promise)
+    queue.pushPromise(d1.promise)
     const d2 = createDeferred()
-    queue.push(d2.promise)
+    queue.pushPromise(d2.promise)
     const d3 = createDeferred()
-    queue.push(d3.promise)
+    queue.pushPromise(d3.promise)
     setTimeout(() => {
       d3.resolve(30)
       d2.resolve(20)
@@ -138,11 +161,11 @@ describe('PullQueue', () => {
   it('should pull values in order from pushed promises that reject later', async () => {
     const queue = new PullQueue()
     const d1 = createDeferred()
-    queue.push(d1.promise)
+    queue.pushPromise(d1.promise)
     const d2 = createDeferred()
-    queue.push(d2.promise)
+    queue.pushPromise(d2.promise)
     const d3 = createDeferred()
-    queue.push(d3.promise)
+    queue.pushPromise(d3.promise)
     setTimeout(() => {
       d3.reject(new Error('3'))
       d2.reject(new Error('2'))

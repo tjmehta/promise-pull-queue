@@ -96,6 +96,31 @@ await Promise.all([
 ])
 ```
 
+#### Pull deferred results off the queue and wait for future promised results, but cancel some
+
+```js
+import PullQueue from 'promise-pull-queue`
+
+const queue = PullQueue()
+
+setTimeout(() => {
+  // promised results pushed later
+  queue.push(Promise.resolve(100))
+  queue.push(Promise.resolve(200))
+  queue.push(Promise.resolve(300))
+}, 100)
+
+// wait for results, before any are pushed
+const controller = new AbortController()
+controller.abort()
+await Promise.all([
+  queue.pull(controller.signal), // [AbortError aborted]
+  queue.pull(), // 100
+  queue.pull(), // 200
+  queue.pull() // 300
+]) // [AbortError aborted]
+```
+
 # License
 
 MIT
