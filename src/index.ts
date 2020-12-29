@@ -55,16 +55,8 @@ export default class DeferredQueue<T> {
       // push the async task to be pulled later
       const deferred = createDeferred<T>()
       this.pushQueue.push((signal) => {
-        return raceAbort(signal, task).then(
-          (val) => {
-            deferred.resolve(val)
-            return Promise.resolve(val)
-          },
-          (err) => {
-            deferred.reject(err)
-            return Promise.reject(err)
-          },
-        )
+        raceAbort(signal, task).then(deferred.resolve, deferred.reject)
+        return deferred.promise
       })
       // prevent unhandled exceptions incase this promise is not handled
       deferred.promise.catch(() => {})
@@ -79,36 +71,19 @@ export default class DeferredQueue<T> {
       const task = this.pushQueue.shift() as Task<T>
       return raceAbort(_signal, task)
     }
-
-    // queue does not have any results,
+    // queue does not have any pushed results
+    if (_signal.aborted) {
+      return Promise.reject(new AbortError())
+    }
     // create a deferred to wait for the next result
     const deferred = createDeferred<T>()
     const pullItem = {
       deferred,
       signal: _signal,
     }
-    const handleAbort = () => pullItem.deferred.reject(new AbortError())
-    const cleanup = () => {
-      pullItem.signal.removeEventListener('abort', handleAbort)
+    this.pullQueue.push(pullItem)
+    return raceAbort(pullItem.signal, deferred.promise).finally(() => {
       this.pullQueue.delete(pullItem)
-    }
-    pullItem.signal.addEventListener('abort', handleAbort)
-    const resolve = deferred.resolve.bind(deferred)
-    const reject = deferred.reject.bind(deferred)
-    pullItem.deferred.resolve = (val) => {
-      cleanup()
-      return resolve(val)
-    }
-    pullItem.deferred.reject = (err) => {
-      cleanup()
-      return reject(err)
-    }
-    if (pullItem.signal.aborted) {
-      handleAbort()
-    } else {
-      this.pullQueue.push(pullItem)
-    }
-
-    return deferred.promise
+    })
   }
 }
