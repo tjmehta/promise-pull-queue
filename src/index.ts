@@ -1,8 +1,8 @@
 import createDeferred, { DeferredPromise } from 'p-defer'
 import raceAbort, { AbortError } from 'race-abort'
 
+import { DoublyLinkedList } from './doubly-linked-list'
 import PLazy from 'p-lazy'
-import TimeOrderedSet from 'time-oset'
 
 export { AbortError } from 'race-abort'
 
@@ -13,8 +13,8 @@ type PullQueueItem<T> = {
 }
 
 export default class DeferredQueue<T> {
-  private pushQueue = new TimeOrderedSet<Task<T>>()
-  private pullQueue = new TimeOrderedSet<PullQueueItem<T>>()
+  private pushQueue = new DoublyLinkedList<Task<T>>()
+  private pullQueue = new DoublyLinkedList<PullQueueItem<T>>()
 
   get pushQueueSize() {
     return this.pushQueue.size
@@ -81,9 +81,9 @@ export default class DeferredQueue<T> {
       deferred,
       signal: _signal,
     }
-    this.pullQueue.push(pullItem)
-    return raceAbort(pullItem.signal, deferred.promise).finally(() => {
-      this.pullQueue.delete(pullItem)
-    })
+    const node = this.pullQueue.push(pullItem)
+    return raceAbort(pullItem.signal, deferred.promise).finally(() =>
+      this.pullQueue.deleteNode(node),
+    )
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "promise-pull-queue",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A promise queue class for handling pull based async tasks",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -42,7 +42,6 @@
   "dependencies": {
     "p-defer": "^3.0.0",
     "p-lazy": "^3.0.0",
-    "race-abort": "^1.0.3",
-    "time-oset": "^1.0.1"
+    "race-abort": "^1.0.3"
   }
 }

@@ -89,9 +89,13 @@ describe('PullQueue', () => {
   it('should pull values in order from resolved promises pushed later, and cancel some', async () => {
     const queue = new PullQueue()
     setTimeout(() => {
+      expect(queue.pushQueueSize).toMatchInlineSnapshot(`0`)
+      expect(queue.pullQueueSize).toMatchInlineSnapshot(`3`)
       queue.pushPromise(Promise.resolve(10))
       queue.pushPromise(Promise.resolve(20))
       queue.pushPromise(Promise.resolve(30))
+      expect(queue.pushQueueSize).toMatchInlineSnapshot(`0`)
+      expect(queue.pullQueueSize).toMatchInlineSnapshot(`0`)
     }, 10)
 
     const controller = new AbortController()
@@ -107,6 +111,8 @@ describe('PullQueue', () => {
       expect(queue.pull()).resolves.toMatchInlineSnapshot(`20`),
       expect(queue.pull()).resolves.toMatchInlineSnapshot(`30`),
     ])
+    expect(queue.pushQueueSize).toMatchInlineSnapshot(`0`)
+    expect(queue.pullQueueSize).toMatchInlineSnapshot(`0`)
   })
 
   it('should pull values in order from pushed rejected promises', async () => {
@@ -145,10 +151,14 @@ describe('PullQueue', () => {
     queue.pushPromise(d2.promise)
     const d3 = createDeferred()
     queue.pushPromise(d3.promise)
+    expect(queue.pushQueueSize).toMatchInlineSnapshot(`3`)
+    expect(queue.pullQueueSize).toMatchInlineSnapshot(`0`)
     setTimeout(() => {
       d3.resolve(30)
       d2.resolve(20)
       d1.resolve(10)
+      expect(queue.pushQueueSize).toMatchInlineSnapshot(`0`)
+      expect(queue.pullQueueSize).toMatchInlineSnapshot(`0`)
     }, 10)
 
     await Promise.all([
