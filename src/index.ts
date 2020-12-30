@@ -1,6 +1,7 @@
 import createDeferred, { DeferredPromise } from 'p-defer'
 import raceAbort, { AbortError } from 'race-abort'
 
+import AbortController from 'abort-controller'
 import { DoublyLinkedList } from './doubly-linked-list'
 import PLazy from 'p-lazy'
 
