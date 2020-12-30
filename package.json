@@ -36,15 +36,15 @@
     "@types/jest": "^25.2.3",
     "babel-core": "^6.26.3",
     "babel-jest": "^26.0.1",
+    "benchmark-util": "^1.0.1",
     "jest": "^26.0.1",
     "matcha": "^0.7.0",
     "prettier": "^2.0.5",
-    "typescript": "^3.9.3",
-    "promise-pull-queue": "1.1.1"
+    "promise-pull-queue": "1.1.1",
+    "typescript": "^3.9.3"
   },
   "dependencies": {
     "abort-controller": "^3.0.0",
-    "benchmark-util": "^1.0.1",
     "p-defer": "^3.0.0",
     "p-lazy": "^3.0.0",
     "race-abort": "^1.0.3"
