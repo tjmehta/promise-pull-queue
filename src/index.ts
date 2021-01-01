@@ -1,7 +1,6 @@
 import createDeferred, { DeferredPromise } from 'p-defer'
 import raceAbort, { AbortError } from 'race-abort'
 
-import AbortController from 'abort-controller'
 import { DoublyLinkedList } from './doubly-linked-list'
 import PLazy from 'p-lazy'
 
@@ -66,7 +65,8 @@ export default class DeferredQueue<T> {
     }
   }
   pull = (signal?: AbortSignal): Promise<T> => {
-    const _signal = signal ?? new AbortController().signal
+    const _signal = signal ?? new NoopAbortSignal()
+
     if (this.pushQueue.size) {
       // queue has results, pull earliest
       const task = this.pushQueue.shift() as Task<T>
@@ -83,8 +83,37 @@ export default class DeferredQueue<T> {
       signal: _signal,
     }
     const node = this.pullQueue.push(pullItem)
+
     return raceAbort(pullItem.signal, deferred.promise).finally(() =>
       this.pullQueue.deleteNode(node),
     )
+  }
+}
+
+class NoopAbortSignal implements AbortSignal {
+  readonly aborted: boolean = false
+  onabort: ((this: AbortSignal, ev: Event) => any) | null = null
+  addEventListener<K extends keyof AbortSignalEventMap>(
+    type: K,
+    listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions,
+  ): void
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void {}
+  removeEventListener<K extends keyof AbortSignalEventMap>(
+    type: K,
+    listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => any,
+    options?: boolean | EventListenerOptions,
+  ): void
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void {}
+  dispatchEvent(event: Event): boolean {
+    return false
   }
 }

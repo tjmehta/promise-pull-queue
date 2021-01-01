@@ -47,6 +47,6 @@
     "abort-controller": "^3.0.0",
     "p-defer": "^3.0.0",
     "p-lazy": "^3.0.0",
-    "race-abort": "^1.0.3"
+    "race-abort": "^2.0.0"
   }
 }
