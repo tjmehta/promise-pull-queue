@@ -1,7 +1,7 @@
 import createDeferred, { DeferredPromise } from 'p-defer'
 import raceAbort, { AbortError } from 'race-abort'
 
-import { DoublyLinkedList } from './doubly-linked-list'
+import { DoublyLinkedList } from './DoublyLinkedList'
 import PLazy from 'p-lazy'
 
 export { AbortError } from 'race-abort'

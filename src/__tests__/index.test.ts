@@ -101,12 +101,18 @@ describe('PullQueue', () => {
     const controller = new AbortController()
     controller.abort()
     await Promise.all([
-      expect(queue.pull(controller.signal)).rejects.toMatchInlineSnapshot(
-        `[AbortError: aborted]`,
-      ),
-      expect(queue.pull(controller.signal)).rejects.toMatchInlineSnapshot(
-        `[AbortError: aborted]`,
-      ),
+      expect(queue.pull(controller.signal)).rejects.toMatchInlineSnapshot(`
+        AbortError {
+          "message": "aborted",
+          "name": "AbortError",
+        }
+      `),
+      expect(queue.pull(controller.signal)).rejects.toMatchInlineSnapshot(`
+        AbortError {
+          "message": "aborted",
+          "name": "AbortError",
+        }
+      `),
       expect(queue.pull()).resolves.toMatchInlineSnapshot(`10`),
       expect(queue.pull()).resolves.toMatchInlineSnapshot(`20`),
       expect(queue.pull()).resolves.toMatchInlineSnapshot(`30`),
