@@ -1,6 +1,6 @@
 {
   "name": "promise-pull-queue",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A promise queue class for handling pull based async tasks",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
