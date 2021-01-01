@@ -146,7 +146,7 @@ describe('doublylinkedlist', () => {
     expect(nodes[4].next === undefined).toBeTruthy()
 
     list.deleteNode(nodes[0])
-    expect(list.size).toMatchInlineSnapshot(`5`)
+    expect(list.size).toMatchInlineSnapshot(`4`)
     expect(list.head === nodes[1]).toBeTruthy()
     expect(list.tail === nodes[4]).toBeTruthy()
     expect(nodes[0].prev === undefined).toBeTruthy()
@@ -161,7 +161,7 @@ describe('doublylinkedlist', () => {
     expect(nodes[4].next === undefined).toBeTruthy()
 
     list.deleteNode(nodes[2])
-    expect(list.size).toMatchInlineSnapshot(`5`)
+    expect(list.size).toMatchInlineSnapshot(`3`)
     expect(list.head === nodes[1]).toBeTruthy()
     expect(list.tail === nodes[4]).toBeTruthy()
     expect(nodes[0].prev === undefined).toBeTruthy()
@@ -176,7 +176,7 @@ describe('doublylinkedlist', () => {
     expect(nodes[4].next === undefined).toBeTruthy()
 
     list.deleteNode(nodes[4])
-    expect(list.size).toMatchInlineSnapshot(`5`)
+    expect(list.size).toMatchInlineSnapshot(`2`)
     expect(list.head === nodes[1]).toBeTruthy()
     expect(list.tail === nodes[3]).toBeTruthy()
     expect(nodes[0].prev === undefined).toBeTruthy()
