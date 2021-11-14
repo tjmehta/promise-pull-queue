@@ -1,7 +1,7 @@
+import DoublyLinkedList, { DoublyNode } from 'doubly'
 import createDeferred, { DeferredPromise } from 'p-defer'
 import raceAbort, { AbortError } from 'race-abort'
 
-import { DoublyLinkedList } from './DoublyLinkedList'
 import PLazy from 'p-lazy'
 
 export { AbortError } from 'race-abort'
@@ -12,7 +12,7 @@ type PullQueueItem<T> = {
   signal: AbortSignal
 }
 
-export default class DeferredQueue<T> {
+export default class PromisePullQueue<T> {
   private pushQueue = new DoublyLinkedList<Task<T>>()
   private pullQueue = new DoublyLinkedList<PullQueueItem<T>>()
 
@@ -82,7 +82,8 @@ export default class DeferredQueue<T> {
       deferred,
       signal: _signal,
     }
-    const node = this.pullQueue.push(pullItem)
+    this.pullQueue.push(pullItem)
+    const node = this.pullQueue.tail as DoublyNode<PullQueueItem<T>>
 
     return raceAbort(pullItem.signal, deferred.promise).finally(() =>
       this.pullQueue.deleteNode(node),
