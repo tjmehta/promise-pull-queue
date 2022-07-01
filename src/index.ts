@@ -93,6 +93,10 @@ export default class PromisePullQueue<T> {
 
 class NoopAbortSignal implements AbortSignal {
   readonly aborted: boolean = false
+  // not implemented..
+  readonly reason: AbortError | undefined
+  // @ts-ignore: not implemented..
+  throwIfAborted: () => void
   onabort: ((this: AbortSignal, ev: Event) => any) | null = null
   addEventListener<K extends keyof AbortSignalEventMap>(
     type: K,
