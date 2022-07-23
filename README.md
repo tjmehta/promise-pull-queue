@@ -14,7 +14,7 @@ npm i --save promise-pull-queue
 
 ```js
 // esm
-import PullQueue from 'promise-pull-queue`
+import PullQueue from 'promise-pull-queue'
 // commonjs
 const PullQueue = require('promise-pull-queue').default
 ```
@@ -22,7 +22,7 @@ const PullQueue = require('promise-pull-queue').default
 #### Push promised results onto the queue and pull them later
 
 ```js
-import PullQueue from 'promise-pull-queue`
+import PullQueue from 'promise-pull-queue'
 
 const queue = PullQueue()
 queue.push(Promise.resolve(100))
@@ -38,7 +38,7 @@ await queue.pull() // 300
 #### Pull promised results off the queue and wait for future results
 
 ```js
-import PullQueue from 'promise-pull-queue`
+import PullQueue from 'promise-pull-queue'
 
 const queue = PullQueue()
 
@@ -77,7 +77,7 @@ await Promise.all([
 #### Pull deferred results off the queue and wait for future promised results
 
 ```js
-import PullQueue from 'promise-pull-queue`
+import PullQueue from 'promise-pull-queue'
 
 const queue = PullQueue()
 
@@ -99,7 +99,7 @@ await Promise.all([
 #### Pull deferred results off the queue and wait for future promised results, but cancel some
 
 ```js
-import PullQueue from 'promise-pull-queue`
+import PullQueue from 'promise-pull-queue'
 
 const queue = PullQueue()
 
